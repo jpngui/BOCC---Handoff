@@ -1,5 +1,7 @@
 # BOCC-Handoff
 
-Read JSON file with Handoff information.
-Allow user to add, modify, delete entries.
-All user operations overwrite JSON file.
+<ul>
+<li>Read JSON file with Handoff information.</li>
+<li>Allow user to add, modify, delete entries.</li>
+<li>All user operations overwrite JSON file.</li>
+</ul>
