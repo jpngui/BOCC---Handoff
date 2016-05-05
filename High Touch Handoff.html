@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<!-- (c)2016 Written by Jonathan Ngui (jngui) aka J-Thugga -->
+
+<!--
+To do:
+	- fix up "modify" and "delete" forms
+	- create functions to actually add, modify and delete entries
+	- event handler for hitting enter to submit form - maybe not, forces user to take a second or two to hit Submit button, ensures content okay
+	- sort orders by "Part ETA" then "FE ETA" when adding entries || modifying and deleting does not require re-sorting
+	- table borders aren't copying into external programs
+	- pasting doesn't work because of isNumberKey(evt) - validate on submission (pattern attribute for input element)
+-->
+
+<html lang="en-US">
+<head>
+
+<meta charset="UTF-8">
+<meta name="author" content="Jonathan Ngui (jngui)/Blue Ocean Contact Centers">
+
+<title>HSBC / WF Handoff</title>
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans+Narrow|Alegreya+Sans|Yanone+Kaffeesatz:400,700|Economica:400,700|sans-serif' rel='stylesheet' type='text/css'>
+
+<style>
+	body {
+		font-family: Calibri,Arial,sans-serif;
+		font-size: 0.9em;
+	}
+
+	table {
+		min-width: 62em;
+	}
+
+	table, th, tr, td {
+		border: 1px solid black;
+		border-collapse: collapse;
+		table-layout: fixed;
+		max-width: 62em;
+	}
+
+	th.title {
+		font-family: Verdana,Calibri,Arial,sans-serif;
+		color: #FF0000;
+		text-align: left;
+		padding-left: 0.6em;
+	}
+
+	td {
+		max-width: 7em;
+		padding: 8px;
+	}
+
+	td.action {
+		max-width: 16em;
+	}
+
+	.addbutton, .modifybutton, .deletebutton, .refreshbutton {
+		position: absolute;
+		left: 63.5em;
+		border: 3px solid #EB9E1A;
+		border-radius: 15px;
+		height: 1.4em;
+		color: #199C22;
+		text-align: left;
+		cursor: pointer;
+		padding: 0px 0px 0px 5px;
+		width: 74px;
+		font-family: "Economica";
+		font-weight: bold;
+		box-shadow: 0px 4px #0D781B;
+	}
+
+	.addbutton {
+		top: 1em;
+	}
+
+	.modifybutton {
+		top: 3.5em;
+	}
+
+	.deletebutton {
+		top: 6em;
+	}
+
+	.refreshbutton {
+		top: 1em;
+		left: 70.5em;
+		text-align: center;
+		padding: 0px 0px 0px 5px;
+		height: 92px;
+		width: 92px;
+		font-weight: bold;
+	}
+
+	.refreshbutton>span {
+		position: relative;
+		top: 35%;
+		font-size: 1.3em;
+	}
+
+	.addbutton:hover, .modifybutton:hover, .deletebutton:hover, .refreshbutton:hover {
+		background-color: #E9F7EA;
+	}
+
+	.addbutton:active, .modifybutton:active, .deletebutton:active, .refreshbutton:active {
+		box-shadow: 0px 2px #0D781B;
+		transform: translateY(2px);
+	}
+
+	.highlight {
+		background-color: yellow;
+	}
+
+	.addForm, .addFormFadeIn, .addFormFadeOut { /* div */
+		position: absolute;
+		top: 10em;
+		left: 63.5em;
+		border: 2px solid orange;
+		border-radius: 15px;
+		padding: 10px;
+		width: 316px;
+	}
+
+	.modifyForm, .modifyFormFadeIn, .modifyFormFadeOut { /* div */
+		position: absolute;
+		top: 10em;
+		left: 63.5em;
+		border: 2px solid orange;
+		border-radius: 15px;
+		padding: 10px;
+		width: 316px;
+	}
+
+	.deleteForm, .deleteFormFadeIn, .deleteFormFadeOut { /* div */
+		position: absolute;
+		top: 10em;
+		left: 63.5em;
+		border: 2px solid orange;
+		border-radius: 15px;
+		padding: 10px;
+		width: 316px;
+	}
+
+	.addForm, .modifyForm, .deleteForm {
+		visibility: hidden;
+		opacity: 0;
+		transition: opacity 0.35s ease-in-out, visibility 0s linear 0.35s;
+	}
+
+	.addFormFadeIn, .modifyFormFadeIn, .deleteFormFadeIn {
+		visibility: visible;
+		opacity: 1;
+		transition: opacity 0.35s ease-in-out, visibility 0s linear 0.15s;
+	}
+
+	.addFormFadeOut, .modifyFormFadeOut, .deleteFormFadeOut {
+		visibility: hidden;
+		opacity: 0;
+		transition: opacity 0.35s ease-in-out, visibility 0s linear 0.35s;
+	}
+
+	form span {
+		display: table-row;
+		line-height: 220%;
+	}
+
+	span>label, span>input {
+		display: table-cell;
+	}
+
+	span>label {
+		width: 4em;
+	}
+
+	span>input {
+		width: 18em;
+	}
+
+	form>input, form>label, textarea {
+		vertical-align: top;
+	}
+
+	div>input {
+		position: relative;
+		top: 3px;
+		left: 7em;
+	}
+
+	#action {
+		resize: vertical;
+	}
+
+	.closeFormButton {
+		cursor: pointer;
+		vertical-align: top;
+		position: relative;
+	}
+
+	.addCloseFormButton {
+		left: 140px;
+	}
+
+	.modifyCloseFormButton {
+		left: 149px;
+	}
+
+	.deleteCloseFormButton {
+		left: 114px;
+	}
+
+	#version {
+		position: relative;
+		left: 5px;
+		color: #DDDDDD;
+	}
+
+	@keyframes fadeIn {
+		0% {
+			opacity: 0;
+			display: none;
+		}
+		100% {
+			opacity: 1;
+			display: initial;
+		}
+	}
+
+	@keyframes fadeOut {
+		0% {
+			opacity: 1;
+			display: initial;
+		}
+		100% {
+			opacity: 0;
+			display: none;
+	}
+
+	@keyframes growIn {
+		0% {
+			width: 0px;
+		}
+		100% {
+			width: 440px;
+		}
+	}
+
+	@keyframes shrinkOut {
+		0% {
+			width: 440px;
+		}
+		100% {
+			width: 0px;
+		}
+	}
+}
+</style>
+
+</head>
+
+<body onLoad="load();">
+
+	<table id="handofftable">
+		<tr>
+			<td></td>
+		</tr>
+	</table>
+
+	<span id="version" style="display: none;">
+		v0.0.3 build 20160504-2123
+	</span>
+
+	<div class="addbutton" onclick="displayForm('addForm');">
+		&#10133; ADD
+	</div>
+
+	<div class="modifybutton" onclick="displayForm('modifyForm');">
+		&#9998; MODIFY
+	</div>
+
+	<div class="deletebutton" onclick="displayForm('deleteForm');">
+		&#10008; DELETE
+	</div>
+
+	<div class="refreshbutton" onclick="load();">
+		<span>&#x21bb; REFRESH</span>
+	</div>
+
+	<div id="addForm" class="addForm">
+		<span>
+			Add an entry for handoff
+			<img class="closeFormButton addCloseFormButton" onclick="closeForm('addForm');" height="24px" width="24px" src="close.png">
+		</span>
+		<form id="addFormForm" onsubmit="addRow()" method="post" action="" target="_self">		
+			<input type="checkbox" id="important" name="important"></input><label for="important"> Important (highlights yellow)</label>
+			<span><label for="rma">RMA: </label><input type="text" name="rma" id="rma" placeholder="8 digits" maxlength="8" required onkeypress="return isNumberKey(event)"></input></span>
+			<span><label for="sr">SR: </label><input type="text" name="sr" id="sr" placeholder="9 digits" maxlength="9" required onkeypress="return isNumberKey(event)"></input></span>
+			<span><label for="country">Country: </label><input type="text" name="country" id="country" placeholder="Include state if possible" required></input></span>
+			<span><label for="parteta">Part ETA: </label><input type="text" name="parteta" id="parteta" placeholder="Include GMT" required></input></span>
+			<span><label for="feeta">FE ETA: </label><input type="text" name="feeta" id="feeta" placeholder="Include GMT" required></input></span>
+			<span><label for="status">Status: </label><input type="text" name="status" id="status" placeholder="Status of order" required></input></span>
+			<span><label for="action">Action: </label><textarea form="addFormForm" name="action" id="action" rows="13" cols="28" maxlength="325" placeholder="Describe what needs to be done" required></textarea></span>
+			<div><input type="submit" value="Submit"></input>&nbsp;&nbsp;&nbsp;<input type="button" value="Clear" onclick="resetForm('addFormForm');"></input></div>
+		</form>	
+	</div>
+
+	<div id="modifyForm" class="modifyForm">
+		<span>
+			Modify a handoff entry
+			<img class="closeFormButton modifyCloseFormButton" onclick="closeForm('modifyForm');" height="24px" width="24px" src="close.png">
+		</span>
+		<form id="modifyFormForm" onsubmit="modifyRow()" method="post">		
+			<input type="checkbox" id="important" name="important"></input><label for="important"> Important (highlights yellow)</label>
+			<span><label for="rma">RMA: </label><input type="text" name="rma" id="rma" placeholder="8 digits" maxlength="8" required onkeypress="return isNumberKey(event)"></input></span>
+			<span><label for="sr">SR: </label><input type="text" name="sr" id="sr" placeholder="9 digits" maxlength="98" required onkeypress="return isNumberKey(event)"></input></span>
+			<span><label for="country">Country: </label><input type="text" name="country" id="country" placeholder="Include state if possible" required></input></span>
+			<span><label for="parteta">Part ETA: </label><input type="text" name="parteta" id="parteta" placeholder="Include GMT" required></input></span>
+			<span><label for="feeta">FE ETA: </label><input type="text" name="feeta" id="feeta" placeholder="Include GMT" required></input></span>
+			<span><label for="status">Status: </label><input type="text" name="status" id="status" placeholder="Status of order" required></input></span>
+			<span><label for="action">Action: </label><textarea form="modifyFormForm" name="action" id="action" rows="13" cols="28" maxlength="325" placeholder="Describe what needs to be done" required></textarea></span>
+			<div><input type="submit" value="Submit"></input>&nbsp;&nbsp;&nbsp;<input type="button" value="Clear" onclick="resetForm('modifyFormForm');"></input></div>
+		</form>	
+	</div>
+
+	<div id="deleteForm" class="deleteForm">
+		<span>
+			Delete an entry from handoff
+			<img class="closeFormButton deleteCloseFormButton" onclick="closeForm('deleteForm');" height="24px" width="24px" src="close.png">
+		</span>
+		<form id="deleteFormForm" onsubmit="deleteRow()" method="post">		
+			<span><label for="rma">RMA: </label><input type="text" name="rma" id="rma" placeholder="8 digits" maxlength="8" required onkeypress="return isNumberKey(event)"></input></span>
+			<div><input type="submit" value="Delete"></input></div>
+		</form>	
+	</div>
+
+<script>
+
+/*
+ * LOAD
+ * Read JSON file ("Handoff.json")
+ * JSON.parse into Array
+ * create table
+ *
+ * ADD
+ * display form
+ * format input into JSON
+ * add to working Array (appendChild?)
+ * WRITE Array to file - overwrite
+ * LOAD or reload page
+ *
+ * MODIFY
+ * display form - ask for RMA number to modify
+ * search array and track array index - if not found, error!
+ * pull info, populate input boxes, let user edit, submit
+ * modify values
+ * WRITE Array to file - overwrite
+ * LOAD or reload page
+ * 
+ * DELETE
+ * display form - ask for RMA number to delete
+ * remove entry from working Array
+ * WRITE Array to file - overwrite
+ * LOAD or reload page
+*/
+
+// important, RMA, SR, Country, Part ETA, FE ETA, Status, Action
+// important => highlight ----> if important = yes, wrap RMA and Status text in <span class="highlight"></span> to highlight
+
+// what happens if Handoff.json is empty? i.e. empty array...
+
+// global variables
+	handofftableArray = []; // empty array, we will create, modify and destroy this array as needed within multiple functions
+
+function load() {
+	// read in Handoff.json
+	// add table rows to class="handofftable"
+
+	var xmlhttp = new XMLHttpRequest();
+	var url = "Handoff.json";
+
+	// table header
+	out = "<tr>\n\t<th>RMA</th>\n\t<th>SR</th>\n\t<th>HSBC RMA<br>Ship to Country</th>\n\t<th>Part ETA</th>\n\t<th>FE ETA</th>\n\t<th>Status</th>\n\t<th>Required Action</th>\n</tr>"
+
+	xmlhttp.onreadystatechange = function() {
+	    if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+	    {
+	        handofftableArray = JSON.parse(xmlhttp.responseText);
+	        displayTable(handofftableArray);
+	    }
+	};
+	xmlhttp.open("GET", url, true);
+	xmlhttp.send();
+/*
+	<tr>
+		<td>arr[i].RMA</td>
+		<td>arr[i].SR</td>
+		<td>arr[i].Country</td>
+		<td>arr[i]["Part ETA"]</td>
+		<td>arr[i]["FE ETA"]</td>
+		<td>arr[i].Status</td>
+		<td class="action">arr[i].Action</td>
+	</tr>
+*/
+	function displayTable(arr) {
+	    for (i = 0; i < arr.length; i++)
+	    {
+	    	out += "<tr><td>";
+
+	    	if (arr[i].important == "yes")
+	    	{
+	    		out += "<span class=\"highlight\">" + arr[i].RMA + "</span>";
+	    	}
+	    	else
+	    	{
+	    		out += arr[i].RMA;
+	    	}
+
+	        out += "</td><td>" + arr[i].SR + "</td><td>" + arr[i].Country + "</td><td>" + arr[i]["Part ETA"] + "</td><td>" + arr[i]["FE ETA"] + "</td><td>";
+
+	        if (arr[i].important == "yes")
+	        {
+	        	out += "<span class=\"highlight\">" + arr[i].Status + "</span>";
+	        }
+	       	else
+	    	{
+	    		out += arr[i].Status;
+	    	}
+
+	        out +=  "</td><td class=\"action\">" + arr[i].Action + "</tr>";
+	    }
+	    document.getElementById("handofftable").innerHTML = out;
+	}
+}
+// end function load()
+
+function addRow() {
+	alert("Added!" + handofftableArray[0].RMA);
+}
+// end function addRow()
+
+function modifyRow() {
+	alert("Modified!" + handofftableArray[1].RMA);
+}
+// end function modifyRow()
+
+function deleteRow() {
+	alert("Deleted!" + handofftableArray[2].RMA);
+}
+// end function deleteRow()
+
+function closeForm(form) {
+	//reset the form and hide it
+	resetForm(form+"Form");
+	document.getElementById(form).className = form+"FadeOut";
+}
+// end function closeForm()
+
+function displayForm(form) {
+	document.getElementById(form).className = form+"FadeIn";
+
+	// hide other forms and reset them
+	if(form == "addForm")
+	{
+		resetForm("modifyFormForm");
+		document.getElementById("modifyForm").className = "modifyFormFadeOut";
+		resetForm("deleteFormForm");
+		document.getElementById("deleteForm").className = "deleteFormFadeOut";
+	}
+	else if(form == "modifyForm")
+	{
+		resetForm("addFormForm");
+		document.getElementById("addForm").className = "addFormFadeOut";
+		resetForm("deleteFormForm");
+		document.getElementById("deleteForm").className = "deleteFormFadeOut";
+	}
+	else if(form == "deleteForm")
+	{
+		resetForm("addFormForm");
+		document.getElementById("addForm").className = "addFormFadeOut";
+		resetForm("modifyFormForm");
+		document.getElementById("modifyForm").className = "modifyFormFadeOut";
+	}
+}
+// end function displayAddForm
+
+function resetForm(form) {
+	document.getElementById(form).reset();
+}
+// end function resetForm()
+
+function isNumberKey(evt){
+	var charCode = (evt.which) ? evt.which : event.keyCode
+	// if charCode = 13 (Enter), execute function
+	if (charCode > 31 && (charCode < 48 || charCode > 57))
+		return false;
+	return true;
+}
+// end function isNumberKey(evt)
+</script>
+
+</body>
+</html>

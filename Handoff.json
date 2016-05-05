@@ -1,0 +1,62 @@
+[
+{
+"important" : "no",
+"RMA" : "87181169",
+"SR" : "638898083",
+"Country" : "HSBC - BR",
+"Part ETA" : "02-MAY-2016 09:00 (GMT -3)",
+"FE ETA" : "02-MAY-2016 10:00 (GMT -3)",
+"Status" : "Details completed",
+"Action" : "Please perform pre-call 1 hour before ETA. If the pre-call is not within your theatre's shift, please place it back into the handoff for visibility for pre-calls."
+},
+{
+"important" : "no",
+"RMA" : "87181126",
+"SR" : "638739553",
+"Country" : "HSBC - BR-MG",
+"Part ETA" : "N/A",
+"FE ETA" : "02-MAY-2016 10:00 (GMT -4)",
+"Status" : "Pending FE details",
+"Action" : "Contact NCR to get confirmed FE details (including Brazil RG, CPF and vehicle) and notify the customer. Please perform pre-call 1 hour before ETA. If the pre-call is not within your theatre's shift, please place it back into the handoff for visibility for pre-calls."
+},
+{
+"important" : "yes",
+"RMA" : "87180986",
+"SR" : "638840209",
+"Country" : "HSBC - BR",
+"Part ETA" : "N/A",
+"FE ETA" : "02-MAY-2016 13:00 (GMT -3)",
+"Status" : "Details completed",
+"Action" : "Please perform pre-call 1 hour before ETA. If the pre-call is not within your theatre's shift, please place it back into the handoff for visibility for pre-calls."
+},
+{
+"important" : "no",
+"RMA" : "87168308",
+"SR" : "637980605",
+"Country" : "HSBC – AR",
+"Part ETA" : "N/A",
+"FE ETA" : "02-MAY-2016 15:00 (GMT -3)",
+"Status" : "Details completed",
+"Action" : "Please perform pre-call 1 hour before ETA. If the pre-call is not within your theatre's shift, please place it back into the handoff for visibility for pre-calls."
+},
+{
+"important" : "yes",
+"RMA" : "87165489",
+"SR" : "637980331",
+"Country" : "HSBC – AR",
+"Part ETA" : "N/A",
+"FE ETA" : "02-MAY-2016 18:00 (GMT -3)",
+"Status" : "Details completed",
+"Action" : "Please perform pre-call 1 hour before ETA. If the pre-call is not within your theatre's shift, please place it back into the handoff for visibility for pre-calls."
+},
+{
+"important" : "no",
+"RMA" : "87176631",
+"SR" : "638875993",
+"Country" : "HSBC - KY (Cayman Islands)",
+"Part ETA" : "already on site",
+"FE ETA" : "02-MAY-2016 19:00 (GMT -5)",
+"Status" : "Pending FE ID and Vehicle information. NCR advised to call back Monday morning local time.",
+"Action" : "Contact NCR to confirm details and notify the customer. The customer has already been notified of FE name and phone number, but ID and Vehicle details are needed. Please perform pre-call 1 hour before ETA. If the pre-call is not within your theatre's shift, please place it back into the handoff for visibility for pre-calls."
+}
+]
