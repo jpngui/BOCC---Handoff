@@ -331,7 +331,7 @@ To do:
 			<div><input type="submit" value="Delete"></input></div>
 		</form>	
 	</div>
-
+<? phpinfo(); ?>
 <script>
 
 /*
@@ -375,10 +375,11 @@ function load() {
 	// add table rows to class="handofftable"
 
 	var xmlhttp = new XMLHttpRequest();
-	var url = "Handoff.json";
+	var url = "Handoff.json", out ="";
 
 	// table header
-	out = "<tr>\n\t<th>RMA</th>\n\t<th>SR</th>\n\t<th>HSBC RMA<br>Ship to Country</th>\n\t<th>Part ETA</th>\n\t<th>FE ETA</th>\n\t<th>Status</th>\n\t<th>Required Action</th>\n</tr>"
+	out += "<tr><th class=\"title\" colspan=\"7\">Alert on HSBC orders needing extra attention:</th></tr>"
+	out += "<tr>\n\t<th>RMA</th>\n\t<th>SR</th>\n\t<th>HSBC RMA<br>Ship to Country</th>\n\t<th>Part ETA</th>\n\t<th>FE ETA</th>\n\t<th>Status</th>\n\t<th>Required Action</th>\n</tr>"
 
 	xmlhttp.onreadystatechange = function() {
 	    if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
